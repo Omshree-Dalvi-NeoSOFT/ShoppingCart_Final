@@ -45,8 +45,8 @@ class CategoryController extends Controller
                 
                 return back()->with('status',"Category added successfully");
             }
-        }catch(\Exception $ex){
-            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
+        }catch(\Illuminate\Database\QueryException $e){
+            return view('layouts.pagenotfound')->with('error', $e->getMessage());
         }
         
     }
