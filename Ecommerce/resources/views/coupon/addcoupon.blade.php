@@ -10,10 +10,9 @@
 
             <div class="card-body">
                 @if (session('status'))
-                    <div class="alert alert-success" role="alert">
+                    <div class="alert alert-success" id="successMessage" role="alert">
                         {{ session('status') }}
                     </div>
-
                 @endif
                 <form action="{{route('PostAddCoupon')}}" method="post">
                     @csrf
@@ -38,7 +37,6 @@
                             <select name="type" id="type" class="form-control @error('code') is-invalid @enderror" value="{{ old('type') }}" autocomplete="type" autofocus>
                                 <option value="">Select</option>
                                 <option value="fixed">Fixed</option>
-                                <option value="percent">Percent</option>
                             </select>
                             @error('type')
                             <span class="invalid-feedback" role="alert">
@@ -108,4 +106,10 @@
         </div>
     </div>
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    setTimeout(function() {
+        $('#successMessage').fadeOut('fast');
+    }, 3000);
+</script>
 @endsection

@@ -14,13 +14,23 @@ class CouponController extends Controller
     
     // display coupon
     public function showCoupons(){
-        $coupons = Coupon::all();
-        return view('coupon.showcoupon',compact('coupons'));
+        try{
+            $coupons = Coupon::all();
+            return view('coupon.showcoupon',compact('coupons'));
+        }catch(\Exception $ex){
+            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
+        }
+        
     }
 
     // add coupon page
     public function addCoupon(){
-        return view('coupon.addcoupon');
+        try{
+            return view('coupon.addcoupon');
+        }catch(\Exception $ex){
+            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
+        }
+       
     }
 
     // add coupon
@@ -33,14 +43,19 @@ class CouponController extends Controller
             'couponstatus' => 'required'
         ]);
         if($validate){
-            $coupon = new Coupon();
+            try{
+                $coupon = new Coupon();
             $coupon->code=$req->code;
             $coupon->type=$req->type;
             $coupon->value=$req->value;
             $coupon->cart_value=$req->cart_value;
             $coupon->couponstatus=$req->couponstatus;
             if($coupon->save()){
-                return back()->withSuccess('Coupon added successfully');            }
+                return back()->withSuccess('Coupon added successfully');
+            }
+            }catch(\Illuminate\Database\QueryException $ex){
+            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
+            }
         }
     }
 
@@ -49,8 +64,8 @@ class CouponController extends Controller
         try{
             $coupon = Coupon::find($id);
             return view('coupon.editcoupon',compact('coupon'));
-        }catch(\Exception $e){
-            return view('layouts.pagenotfound');
+        }catch(\Exception $ex){
+            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
         }
         
     }
@@ -65,27 +80,35 @@ class CouponController extends Controller
             'couponstatus' =>'required'
         ]);
         if($validate){
-            $coupon = Coupon::find($req->id);
-            $coupon->code=$req->code;
-            $coupon->type=$req->type;
-            $coupon->value=$req->value;
-            $coupon->cart_value=$req->cart_value;
-            $coupon->couponstatus=$req->couponstatus;
-            if($coupon->save()){
-                return back()->with('status','Coupon updated successfully');
+            try{
+                $coupon = Coupon::find($req->id);
+                $coupon->code=$req->code;
+                $coupon->type=$req->type;
+                $coupon->value=$req->value;
+                $coupon->cart_value=$req->cart_value;
+                $coupon->couponstatus=$req->couponstatus;
+                if($coupon->save()){
+                    return back()->with('status','Coupon updated successfully');
+                }
+            }catch(\Illuminate\Database\QueryException $ex){
+            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
             }
         }
     }
 
     // delete coupon
     public function deleteCoupon(Request $req){
-        $coupon = Coupon::find($req->cid);
-        if($coupon->delete()){
-            return back()->withSuccess('Coupon deleted successfully');
-        }
-        else
-        {
-            return back()->withFail('Error while deleting');
+        try{
+            $coupon = Coupon::find($req->cid);
+            if($coupon->delete()){
+                return back()->withSuccess('Coupon deleted successfully');
+            }
+            else
+            {
+                return back()->withFail('Error while deleting');
+            }
+        }catch(\Exception $ex){
+            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
         }
     }
 }

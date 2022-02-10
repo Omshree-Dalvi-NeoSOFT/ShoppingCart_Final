@@ -107,28 +107,29 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
+
           <!-- User Management -->
-          <li class="nav-item ">
-            <a href="#" class="nav-link ">
+          <li class="nav-item {{ request()->is('adduser') || request()->is('showuser') ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->is('adduser') || request()->is('showuser') ? 'active' : '' }}">
               <i class="nav-icon fas fa-tachometer-alt"></i>
-              <p>
+              <p class="{{ request()->is('adduser') || request()->is('showuser') ? 'text-white' : '' }}">
                 User Management
-                <i class="fas fa-angle-left right"></i>
-                <span class="badge badge-info right">2</span>
+                <i class="fas fa-angle-left right "></i>
+                <span class="badge badge-info right"></span>
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{route('AddUser')}}" class="nav-link ">
+                <a href="{{route('AddUser')}}" class="nav-link {{ request()->is('adduser') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Add User</p>
+                  <p class=" {{ request()->is('adduser') ? 'text-dark' : '' }}">Add User</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('ShowUser')}}" class="nav-link">
+                <a href="{{route('ShowUser')}}" class="nav-link {{ request()->is('showuser') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Modify User</p>
+                  <p class="{{ request()->is('showuser') ? 'text-dark' : '' }}">Modify User</p>
                 </a>
               </li>
             </ul>
@@ -136,27 +137,27 @@
 
           <!-- Banner Management -->
 
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          <li class="nav-item {{ request()->is('addbanner') || request()->is('showbanner') ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->is('addbanner') || request()->is('showbanner') ? 'active' : '' }}">
               <i class="nav-icon fas fa-chart-pie"></i>
-              <p>
-                Banner Management
+              <p class="{{ request()->is('addbanner') || request()->is('showbanner') ? 'text-white' : '' }}">
+              Banner Management
                 <i class="fas fa-angle-left right"></i>
-                <span class="badge badge-info right">2</span>
+                <span class="badge badge-info right"></span>
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{route('AddBanner')}}" class="nav-link">
+                <a href="{{route('AddBanner')}}" class="nav-link {{ request()->is('addbanner') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Add Banner</p>
+                  <p class="{{ request()->is('addbanner') ? 'text-dark' : '' }}">Add Banner</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('ShowBanner')}}" class="nav-link">
+                <a href="{{route('ShowBanner')}}" class="nav-link {{ request()->is('showbanner') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Modify Banner</p>
+                  <p class="{{ request()->is('showbanner') ? 'text-dark' : '' }}">Modify Banner</p>
                 </a>
               </li>
             </ul>
@@ -164,37 +165,37 @@
 
           <!-- Category Management -->
 
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          <li class="nav-item {{ request()->is('addcategory') || request()->is('showcategory') || request()->is('addsubcategory') || request()->is('showsubcategory') ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->is('addcategory') || request()->is('showcategory') || request()->is('addsubcategory') || request()->is('showsubcategory') ? 'active' : '' }}">
               <i class="nav-icon fas fa-tree"></i>
-              <p>
+              <p class="{{ request()->is('addcategory') || request()->is('showcategory') || request()->is('addsubcategory') || request()->is('showsubcategory') ? 'text-white' : '' }}">
                 Category Management
                 <i class="fas fa-angle-left right"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{route('AddCategory')}}" class="nav-link">
+                <a href="{{route('AddCategory')}}" class="nav-link {{ request()->is('addcategory') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Add Category</p>
+                  <p class="{{ request()->is('addcategory') ? 'text-dark' : '' }}">Add Category</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('ShowCategory')}}" class="nav-link">
+                <a href="{{route('ShowCategory')}}" class="nav-link {{ request()->is('showcategory') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Modify Category</p>
+                  <p class="{{ request()->is('showcategory') ? 'text-dark' : '' }}">Modify Category</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('AddSubCategory')}}" class="nav-link">
+                <a href="{{route('AddSubCategory')}}" class="nav-link {{ request()->is('addsubcategory') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Add Sub-Category</p>
+                  <p class="{{ request()->is('addsubcategory') ? 'text-dark' : '' }}">Add Sub-Category</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('ShowSubCategory')}}" class="nav-link">
+                <a href="{{route('ShowSubCategory')}}" class="nav-link {{ request()->is('showsubcategory') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Modify Sub-Category</p>
+                  <p class="{{ request()->is('showsubcategory') ? 'text-dark' : '' }}">Modify Sub-Category</p>
                 </a>
               </li>
               
@@ -203,25 +204,25 @@
 
           <!-- Product Management -->
 
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          <li class="nav-item {{ request()->is('addproduct') || request()->is('showproduct') ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->is('addproduct') || request()->is('showproduct') ? 'active' : '' }}">
               <i class="nav-icon fas fa-edit"></i>
-              <p>
+              <p class="{{ request()->is('addproduct') || request()->is('showproduct') ? 'text-white' : '' }}">
                 Product Management
                 <i class="fas fa-angle-left right"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{route('AddProduct')}}" class="nav-link">
+                <a href="{{route('AddProduct')}}" class="nav-link {{ request()->is('addproduct') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Add Product</p>
+                  <p class="{{ request()->is('addproduct') ? 'text-dark' : '' }}">Add Product</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('ShowProduct')}}" class="nav-link">
+                <a href="{{route('ShowProduct')}}" class="nav-link {{ request()->is('showproduct') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Modify Product</p>
+                  <p class="{{ request()->is('showproduct') ? 'text-dark' : '' }}">Modify Product</p>
                 </a>
               </li>
             </ul>
@@ -229,25 +230,25 @@
           </li>
 
           <!-- Coupon Management -->
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          <li class="nav-item {{ request()->is('addcoupon') || request()->is('showcoupons')  ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->is('addcoupon') || request()->is('showcoupons')  ? 'active' : '' }}">
               <i class="nav-icon fas fa-table"></i>
-              <p>
+              <p class="{{ request()->is('addcoupon') || request()->is('showcoupons')  ? 'text-white' : '' }}">
                 Coupon Management
                 <i class="fas fa-angle-left right"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{route('AddCoupon')}}" class="nav-link">
+                <a href="{{route('AddCoupon')}}" class="nav-link {{ request()->is('addcoupon') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Add Coupon</p>
+                  <p class="{{ request()->is('addcoupon') ? 'text-dark' : '' }}">Add Coupon</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('ShowCoupons')}}" class="nav-link">
+                <a href="{{route('ShowCoupons')}}" class="nav-link {{ request()->is('showcoupons') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Modify Coupon</p>
+                  <p class="{{ request()->is('showcoupons') ? 'text-dark' : '' }}">Modify Coupon</p>
                 </a>
               </li>
             </ul>
@@ -257,9 +258,9 @@
 
           <!-- contact Notification -->
           <li class="nav-item">
-            <a href="{{route('ContactUs')}}" class="nav-link">
+            <a href="{{route('ContactUs')}}" class="nav-link {{ request()->is('contactus') ? 'active' : '' }}">
               <i class="nav-icon far fa-image"></i>
-              <p>
+              <p class="{{ request()->is('contactus') ? 'text-white' : '' }}">
                 Contact Notifications
               </p>
             </a>
@@ -267,34 +268,28 @@
           
           <!-- CMS -->
           <li class="nav-item">
-            <a href="{{route('AddCMS')}}" class="nav-link">
+            <a href="{{route('AddCMS')}}" class="nav-link {{ request()->is('cms') || request()->is('displaycms')  ? 'active' : '' }}">
               <i class="nav-icon fas fa-columns"></i>
-              <p>
+              <p class="{{ request()->is('cms') || request()->is('displaycms')  ? 'text-white' : '' }}">
                 CMS
               </p>
             </a>
           </li>
           
           <!-- Order Management -->
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          <li class="nav-item {{ request()->is('order') ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->is('order') ? 'active' : '' }}">
               <i class="nav-icon fas fa-book"></i>
-              <p>
+              <p class="{{ request()->is('order') ? 'text-white' : '' }}">
                 Order Management
                 <i class="fas fa-angle-left right"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
-              <!-- <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Invoice</p>
-                </a>
-              </li> -->
               <li class="nav-item">
-                <a href="{{route('Orders')}}" class="nav-link">
+                <a href="{{route('Orders')}}" class="nav-link {{ request()->is('order') ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Order Details</p>
+                  <p class="{{ request()->is('order') ? 'text-dark' : '' }}">Order Details</p>
                 </a>
               </li>
             </ul>
@@ -392,9 +387,9 @@
 
           <!-- Settings -->
           <li class="nav-item">
-            <a href="{{route('userSettings')}}" class="nav-link">
+            <a href="{{route('userSettings')}}" class="nav-link {{ request()->is('usersettings') ? 'active' : '' }}">
               <i class="nav-icon fas fa-user-cog"></i>
-              <p>
+              <p class="{{ request()->is('usersettings') ? 'text-white' : '' }}">
                 Settings
               </p>
             </a>

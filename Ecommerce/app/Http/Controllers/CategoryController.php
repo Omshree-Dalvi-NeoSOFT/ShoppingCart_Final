@@ -14,31 +14,41 @@ class CategoryController extends Controller
     
     // add category page
     public function addCategory(){
-        return view('category.addcategory');
+        try{
+            return view('category.addcategory');
+        }catch(\Exception $ex){
+            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
+        }
+        
     }
 
     // add category
     public function postAddCategory(Request $req){
-        $validate = $req->validate([
-            'catname' => ['required','string', 'max:255'],
-            'catdescription' => ['max:300']
-        ]);
-
-        if($validate){
-            try{
+        try{
+            $validate = $req->validate([
+                'catname' => ['required','string', 'max:255' , 'unique:categories,cat_name'],
+                'catdescription' => ['max:300']
+            ]);
+    
+            if($validate){
                 $category = new Category();
-                $category->cat_name = $req->catname;
-                $category->cat_description = $req->catdescription;
-                $category->save();
-            }catch(\Illuminate\Database\QueryException $e){
-                $errorCode = $e->errorInfo[1];
-                    if($errorCode == 1062){
-                        return view('category.duplicate');
-                    }
+                    $category->cat_name = $req->catname;
+                    $category->cat_description = $req->catdescription;
+                    $category->save();
+                // try{
+                // }catch(\Illuminate\Database\QueryException $e){
+                //     $errorCode = $e->errorInfo[1];
+                //         if($errorCode == 1062){
+                //             return view('category.duplicate');
+                //         }
+                // }
+                
+                return back()->with('status',"Category added successfully");
             }
-            
-            return back()->with('status',"Category added successfully");
+        }catch(\Exception $ex){
+            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
         }
+        
     }
 
     // display category
@@ -46,8 +56,8 @@ class CategoryController extends Controller
         try{
             $category = Category::paginate(5)->all();
             return view('category.showcategory',compact('category'));   
-        }catch(\Exception $e){
-            return view('category.categorynotfound');
+        }catch(\Exception $ex){
+            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
         }
     }
 
@@ -56,8 +66,8 @@ class CategoryController extends Controller
         try {
             $category = Category::where('id', $id)->firstorFail();
             return view('category.editcategory', compact('category'));
-        } catch (\Exception $exceptions) {
-            return view('category.categorynotfound');
+        }catch(\Exception $ex){
+            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
         }
         
     }
@@ -65,7 +75,7 @@ class CategoryController extends Controller
     // update category
     public function updateCategory(Request $req){
         $validate = $req->validate([
-            'catname' => ['required','string', 'max:255'],
+            'catname' => ['required','string', 'max:255','unique:categories,cat_name,'.$req->catid],
             'catdescription' => ['max:300']
         ]);
         if($validate){
@@ -89,10 +99,9 @@ class CategoryController extends Controller
     public function deleteCategory(Request $req){
         try{
             Category::where('id',$req->aid)->delete();
-        }catch(\Exception $exception){
-            return view('category.categorynotfound');
+            return back();
+        }catch(\Exception $ex){
+            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
         }
-        
-        return back();
     }
 }

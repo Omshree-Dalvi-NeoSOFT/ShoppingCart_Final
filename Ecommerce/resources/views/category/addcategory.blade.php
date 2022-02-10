@@ -9,10 +9,9 @@
 
             <div class="card-body">
                 @if (session('status'))
-                    <div class="alert alert-success" role="alert">
+                    <div class="alert alert-success" id="successMessage" role="alert">
                         {{ session('status') }}
                     </div>
-
                 @endif
 
                 <form action="{{route('PostAddCategory')}}" method="POST">
@@ -55,4 +54,10 @@
         </div>
     </div>
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    setTimeout(function() {
+        $('#successMessage').fadeOut('fast');
+    }, 3000);
+</script>
 @endsection

@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Mail\RegisterMail;
 use App\Models\NewaLetter;
 use App\Models\Settings;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -36,35 +37,44 @@ class UserController extends Controller
 
     // display all users
     public function Index(){
-        $data = User::all();
-        return response()->json($data);
+        try{
+            $data = User::all();
+            return response()->json($data);
+        }catch(\Exception $e){
+            return response()->json($e->getMessage());
+        }
     }
 
     // login user
     public function login(Request $request){
-        $validator = Validator::make($request->all(),[
-            'email'=>'required',
-            'password'=>'required'
-        ]);
-        if($validator->fails()){
-            return response()->json($validator->errors());
-        }
-        else {
-            if(!$token = auth()->attempt($validator->validated())){
-               return response()->json(['err'=>"Unauthorized User !"],401);
-            }
-            $user = User::where('email',$request->email)->first();
-            return response()->json([
-                'access_token'=>$token,
-                'token_type'=>'bearer',
-                'expires_in'=>auth()->guard('api')->factory()->getTTL()*60,
-                'user'=>$user
+        try{
+            $validator = Validator::make($request->all(),[
+                'email'=>'required',
+                'password'=>'required'
             ]);
+            if($validator->fails()){
+                return response()->json($validator->errors());
+            }
+            else {
+                if(!$token = auth()->attempt($validator->validated())){
+                return response()->json(['err'=>"Unauthorized User !"],401);
+                }
+                $user = User::where('email',$request->email)->first();
+                return response()->json([
+                    'access_token'=>$token,
+                    'token_type'=>'bearer',
+                    'expires_in'=>auth()->guard('api')->factory()->getTTL()*60,
+                    'user'=>$user
+                ]);
+            }
+        }catch(\Exception $e){
+            return response()->json(['err'=>"Something went wrong !!"]);
         }
     }
 
     // register user
     public function registerUser(Request $request){
+        try{
             User::create([
                 'firstname' => $request->ufname,
                 'lastname' => $request->ulname,
@@ -87,8 +97,14 @@ class UserController extends Controller
                     $message->subject('New User Registered !');
                 });
             }
-            return response()->json(['msg'=>"User Registered Successfully !"]);
-        
+            return response()->json(['msg'=>"User Registered Successfully !"]);   
+
+        }catch(\Illuminate\Database\QueryException $e){
+            $errorCode = $e->errorInfo[1];
+                if($errorCode == 1062){
+                    return response()->json(['err'=>"User Email Already Registered !!"]);
+                }
+        }
     }
 
     // fetch contact us 
@@ -100,7 +116,7 @@ class UserController extends Controller
             'message'=>'required|min:5|max:500'
         ]);
         if($validator->fails()){
-            return response()->json($validator->errors());
+            return response()->json(['err'=>"Something went wrong !!"]);
         }
         else{
             $contact = new ContactUs();
@@ -108,6 +124,7 @@ class UserController extends Controller
             $contact->email = $request->email;
             $contact->subject = $request->subject;
             $contact->message = $request->message;
+            $contact->status = 0;
             $contact->save();
             return response()->json(['msg'=>"we will contact you"]);
         }
@@ -158,7 +175,7 @@ class UserController extends Controller
 
     // get current product details
     public function currentProductsDetails($id){
-        $product = Product::with('Images','prodAttr')->find($id);
+        $product = Product::with('images','prodAttr')->find($id);
         return response()->json($product);
 
     }
@@ -236,66 +253,74 @@ class UserController extends Controller
 
     // fetch checkout data
     public function Checkout(Request $req){
-        $uemail = $req->uemail;
-        $user = User::where('email',$uemail)->first();
+        DB::beginTransaction();
+        try{
+            $uemail = $req->uemail;
+            $user = User::where('email',$uemail)->first();
 
-        $userdetails = new UserDetails();
-        $userdetails->user_id = $user->id;
-        $userdetails->email = $req->email;
-        $userdetails->firstname = $req->firstname;
-        $userdetails->middlename = $req->middlename;
-        $userdetails->lastname = $req->lastname;
-        $userdetails->address1 = $req->address1;
-        $userdetails->address2 = $req->address2;
-        $userdetails->zip = $req->zip;
-        $userdetails->phone = $req->phone;
-        $userdetails->mobilephone =$req->mobilephone;
-        $userdetails->shipping = $req->shipping;
-        $userdetails->save();
+            $userdetails = new UserDetails();
+            $userdetails->user_id = $user->id;
+            $userdetails->email = $req->email;
+            $userdetails->firstname = $req->firstname;
+            $userdetails->middlename = $req->middlename;
+            $userdetails->lastname = $req->lastname;
+            $userdetails->address1 = $req->address1;
+            $userdetails->address2 = $req->address2;
+            $userdetails->zip = $req->zip;
+            $userdetails->phone = $req->phone;
+            $userdetails->mobilephone =$req->mobilephone;
+            $userdetails->shipping = $req->shipping;
+            $userdetails->save();
 
-        $userdetail = UserDetails::latest()->first();
-        
-        $orders = $req->cart;
-        foreach($orders as $ord){
-            $order = new Order();
-            $order->userdetail_id = $userdetail->id;
-            $order->product_id = $ord['product_id'];
-            $order->save();
-        }
+            $userdetail = UserDetails::latest()->first();
+            
+            $orders = $req->cart;
+            foreach($orders as $ord){
+                $order = new Order();
+                $order->userdetail_id = $userdetail->id;
+                $order->product_id = $ord['product_id'];
+                $order->save();
+            }
 
-        $orderdetail = new OrderDetails();
-        $orderdetail->userdetail_id = $userdetail->id;
-        $orderdetail->grandtotal = $req->grandtotal;
-        $orderdetail->finalTotal = $req->finalTotal;
-        $orderdetail->status="Pending";
-        
-        if($req->coupon){
-            $coupon = $req->coupon;
-        foreach($coupon as $c){
-            $orderdetail->coupon_id =$c['id'];
-        }
-        }
-        $orderdetail->save();
-        
-        // mail of order
-        $data = ['fname' => $req->firstname,'lname' => $req->lastname,'email' => $req->uemail,'password' => $req->upassword, 'address1' => $req->address1, 'zip' => $req->zip,'phone' => $req->phone,'grandtotal' => $req->grandtotal,'finalTotal' => $req->finalTotal];
-        $user['to'] = $uemail;
-        
-        Mail::send('email.order',$data,function($message) use ($user){
-            $message->to($user['to']);
-            $message->subject('Order Placed !');
-        });
-
-        // copy to admin
-        $settings = Settings::first();
-        if($settings->order == 1){
-            Mail::send('email.admincopy',$data,function($message) use ($user){
-                $message->to('omshreedalvi98@gmail.com');
-                $message->subject('New Order Placed !');
+            $orderdetail = new OrderDetails();
+            $orderdetail->userdetail_id = $userdetail->id;
+            $orderdetail->grandtotal = $req->grandtotal;
+            $orderdetail->finalTotal = $req->finalTotal;
+            $orderdetail->status="Pending";
+            
+            if($req->coupon){
+                $coupon = $req->coupon;
+            foreach($coupon as $c){
+                $orderdetail->coupon_id =$c['id'];
+            }
+            }
+            $orderdetail->save();
+            
+            // mail of order
+            $data = ['fname' => $req->firstname,'lname' => $req->lastname,'email' => $req->uemail,'password' => $req->upassword, 'address1' => $req->address1, 'zip' => $req->zip,'phone' => $req->phone,'grandtotal' => $req->grandtotal,'finalTotal' => $req->finalTotal];
+            $user['to'] = $uemail;
+            
+            Mail::send('email.order',$data,function($message) use ($user){
+                $message->to($user['to']);
+                $message->subject('Order Placed !');
             });
+
+            // copy to admin
+            $settings = Settings::first();
+            if($settings->order == 1){
+                Mail::send('email.admincopy',$data,function($message) use ($user){
+                    $message->to('omshreedalvi98@gmail.com');
+                    $message->subject('New Order Placed !');
+                });
+            }
+            DB::commit();
+            return response()->json(['msg'=>"Order Placed Successfully !"]);
+        }catch(\Exception $e){
+            DB::rollBack();
+            return response()->json(['err'=>"Something went wrong !!"]);
+            
         }
         
-        return response()->json(['msg'=>"Order Placed Successfully !"]);
     }
 
     // add wish list

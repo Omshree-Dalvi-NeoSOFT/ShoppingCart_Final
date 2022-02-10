@@ -16,8 +16,8 @@
             </div>
 
             <div class="card-body">
-                @if (session('status'))
-                    <div class="alert alert-success" role="alert">
+            @if (session('status'))
+                    <div class="alert alert-success" id="successMessage" role="alert">
                         {{ session('status') }}
                     </div>
                 @endif

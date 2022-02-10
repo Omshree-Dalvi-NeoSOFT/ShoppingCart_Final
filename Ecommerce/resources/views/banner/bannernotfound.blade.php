@@ -6,14 +6,6 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-header">{{ __('Error') }}</div>
-
-            <div class="card-body">
-                @if (session('status'))
-                    <div class="alert alert-success" role="alert">
-                        {{ session('status') }}
-                    </div>
-                @endif
-
                 {{ __('No Record Found') }}
             </div>
         </div>

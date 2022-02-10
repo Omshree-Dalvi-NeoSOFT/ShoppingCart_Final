@@ -9,7 +9,7 @@
 
             <div class="card-body">
                 @if (session('status'))
-                    <div class="alert alert-success" role="alert">
+                    <div class="alert alert-success" id="successMessage" role="alert">
                         {{ session('status') }}
                     </div>
                 @endif
@@ -93,11 +93,42 @@
             })
         })
         $(function () {
-            $("#example1").DataTable({
-            "responsive": true, "lengthChange": false, "autoWidth": false,
-            "buttons": ["copy", "csv", "excel", "pdf"]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+            $('#example1').DataTable( {
+                "responsive": false, 
+                "lengthChange": false,
+                "autoWidth": false,
+                "bPaginate": true,
+                "bInfo": false,
+                dom: 'Blfrtip',
+                buttons: [
+                    {
+                extend: 'csv',
+                footer: false,
+                exportOptions: {
+                        columns: [0,1,2,3,4]
+                    }
+            },
+            {
+                extend: 'excel',
+                footer: false,
+                exportOptions: {
+                        columns: [0,1,2,3,4]
+                    }
+            },
+            {
+                extend: 'pdf',
+                title:'Users',
+                footer: true,
+                exportOptions: {
+                        columns: [0,1,2,3,4]
+                    }
+            }
+            ]
+            } ).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });
+        setTimeout(function() {
+        $('#successMessage').fadeOut('fast');
+    }, 3000);
     </script>
           
 @endsection

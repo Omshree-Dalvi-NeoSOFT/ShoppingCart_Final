@@ -8,11 +8,7 @@
             <div class="card-header">{{ __('Update Banner') }}</div>
 
             <div class="card-body">
-                @if (session('status'))
-                    <div class="alert alert-success" role="alert">
-                        {{ session('status') }}
-                    </div>
-                @endif
+                
                 <form method="post" enctype="multipart/form-data" action="{{route('PostUpdateBanner')}}">
                     @csrf
                     <input type="hidden" value="{{$banner->id}}" name="id" />
@@ -68,4 +64,5 @@
         </div>
     </div>
 </div>
+
 @endsection

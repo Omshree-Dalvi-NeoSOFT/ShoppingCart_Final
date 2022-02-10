@@ -35,6 +35,8 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+Route::middleware(['auth', 'isAdmin'])->group(function () {
+
 // user
 Route::get('/adduser',[AdminController::class,'addUser'])->name('AddUser');
 Route::get('/showuser',[AdminController::class,'showUser'])->name('ShowUser');
@@ -80,6 +82,8 @@ Route::patch('/deleteproduct',[ProductController::class,'deleteProduct'])->name(
 
 // Contact Us
 Route::get('/contactus',[ContactUsController::class,'contactUs'])->name('ContactUs');
+Route::get('/replycontact/{id}',[ContactUsController::class,'replyContact'])->name('replyContact');
+Route::post('/reply',[ContactUsController::class,'postreplyContact'])->name('postreplyContact');
 
 // CMS
 Route::get('/cms',[CMSController::class,'addCMS'])->name('AddCMS');
@@ -106,3 +110,5 @@ Route::post('/updatestatus',[OrderController::class,'updateStatus'])->name('Upda
 // settings
 Route::get('/usersettings',[AdminController::class,'userSettings'])->name('userSettings');
 Route::post('/updatesettings',[AdminController::class,'updateSettings'])->name('updateSettings');
+
+});

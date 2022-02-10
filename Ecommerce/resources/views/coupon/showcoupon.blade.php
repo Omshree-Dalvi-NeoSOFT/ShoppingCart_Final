@@ -35,8 +35,8 @@
             </div>
 
             <div class="card-body">
-                @if (session('status'))
-                    <div class="alert alert-success" role="alert">
+            @if (session('status'))
+                    <div class="alert alert-success" id="successMessage" role="alert">
                         {{ session('status') }}
                     </div>
                 @endif
@@ -82,4 +82,43 @@
         </div>
     </div>
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+       $(function () {
+            $('#mytable').DataTable( {
+                "responsive": false, 
+                "lengthChange": false,
+                "autoWidth": false,
+                dom: 'Blfrtip',
+                buttons: [
+                    {
+                extend: 'csv',
+                footer: false,
+                exportOptions: {
+                        columns: [0,1,2,3,4,5]
+                    }
+            },
+            {
+                extend: 'excel',
+                footer: false,
+                exportOptions: {
+                        columns: [0,1,2,3,4,5]
+                    }
+            },
+            {
+                extend: 'pdf',
+                title:'Coupon',
+                footer: true,
+                exportOptions: {
+                        columns: [0,1,2,3,4,5]
+                    }
+            }
+            ]
+            } ).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        });
+        setTimeout(function() {
+        $('#successMessage').fadeOut('fast');
+    }, 3000);
+    </script>
+
 @endsection

@@ -15,14 +15,16 @@ class BannerController extends Controller
     }
     
     // show banner page
-    public function addBanner()
-    {
-        return view('banner.addbanner');
+    public function addBanner(){
+        try{
+            return view('banner.addbanner');
+        }catch(\Exception $ex){
+            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
+        }
     }
 
     // add banner
-    public function postAddBanner(Request $req)
-    {
+    public function postAddBanner(Request $req){
         $validateData = $req->validate([
             'heading' => ['required', 'string', 'max:255'],
             'description' => ['string', 'max:300'],
@@ -31,6 +33,7 @@ class BannerController extends Controller
         ]);
 
         if ($validateData) {
+            try{
             $file = $req->file('bannerimage');
             $fname = $file->getClientOriginalName();
             $filename = rand() . "-" . time() . "-" . $fname;
@@ -60,6 +63,9 @@ class BannerController extends Controller
                 $banner->save();
                 return back()->with('status', "Banner Added !");
             }
+            }catch(\Exception $ex){
+                return view('layouts.pagenotfound')->with('error', $ex->getMessage());
+            }
         }
     }
 
@@ -68,10 +74,10 @@ class BannerController extends Controller
     {
         try {
             $banners = Banner::paginate(5)->all();
-        } catch (\Exception $exceptions) {
-            return view('banner.bannernotfound');
+            return view('banner.showbanner', compact('banners'));
+        }catch(\Exception $ex){
+            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
         }
-        return view('banner.showbanner', compact('banners'));
     }
 
     // edit banner page
@@ -79,10 +85,11 @@ class BannerController extends Controller
     {
         try {
             $banner = Banner::where('id', $id)->firstorFail();
-        } catch (\Exception $exceptions) {
-            return view('banner.bannernotfound');
+            return view('banner.editbanner', compact('banner'));
+        }catch(\Exception $ex){
+            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
         }
-        return view('banner.editbanner', compact('banner'));
+        
     }
 
     // update banner
@@ -91,44 +98,67 @@ class BannerController extends Controller
         $validateData = $req->validate([
             'heading' => ['required', 'string', 'max:255'],
             'description' => ['string', 'max:300'],
-            'bannerimage' => ['mimes:jpg,png,jpeg,JPG,PNG,JPEG'],
+            'bannerimage' => ['required', 'mimes:jpg,png,jpeg,JPG,PNG,JPEG'],
             'bannertag' => ['mimes:jpg,png,jpeg,JPG,PNG,JPEG']
         ]);
+
         if ($validateData) {
-            $banner = Banner::findorFail($req->id);
-            
-            if($req->hasFile('bannerimage')){
+            try{
+            $validateData = $req->validate([
+                'heading' => ['required', 'string', 'max:255'],
+                'description' => ['string', 'max:300'],
+                'bannerimage' => ['mimes:jpg,png,jpeg,JPG,PNG,JPEG'],
+                'bannertag' => ['mimes:jpg,png,jpeg,JPG,PNG,JPEG']
+            ]);
+            if ($validateData) {
+                $banner = Banner::findorFail($req->id);
                 
-                $file = $req->file('bannerimage');
-                $fname = $file->getClientOriginalName();
-                $destination=public_path('images/banner/'.$banner->banner_image);
-                if(File::exists($destination)){
-                    unlink($destination);
-                } 
-                $filename = rand() . "-" . time() . "-" . $fname;
-                $des = public_path('/images/banner');
-                $file->move($des, $filename);
-                $banner->banner_image = $filename;
-            }
-
-            if($req->hasFile('bannertag')){
-                $filetag = $req->file('bannertag');
-                $fnametag = $filetag->getClientOriginalName();
-                $destag = public_path('/images/bannertags/'.$banner->price_tag);
-                if(File::exists($destag)){
-                    unlink($destag);
+                if($req->hasFile('bannerimage')){
+                    
+                    $file = $req->file('bannerimage');
+                    $fname = $file->getClientOriginalName();
+                    $destination=public_path('images/banner/'.$banner->banner_image);
+                    if(File::exists($destination)){
+                        unlink($destination);
+                    } 
+                    $filename = rand() . "-" . time() . "-" . $fname;
+                    $des = public_path('/images/banner');
+                    $file->move($des, $filename);
+                    $banner->banner_image = $filename;
                 }
-
-                $filenametag = rand() . "-" . time() . "-" . $fnametag;
-                $destag = public_path('images/bannertags');
-                $filetag->move($destag,$filenametag);
-                $banner->price_tag = $filenametag;
+    
+                if($req->hasFile('bannertag')){
+                    $filetag = $req->file('bannertag');
+                    $fnametag = $filetag->getClientOriginalName();
+                    if($banner->price_tag){
+                        $destag = public_path('/images/bannertags/'.$banner->price_tag);
+                        if(File::exists($destag)){
+                            unlink($destag);
+                        }
+                        $filenametag = rand() . "-" . time() . "-" . $fnametag;
+                        $destag = public_path('images/bannertags');
+                        $filetag->move($destag,$filenametag);
+                        $banner->price_tag = $filenametag;
+                    }
+                    else{
+                        $filenametag = rand() . "-" . time() . "-" . $fnametag;
+                    $destag = public_path('images/bannertags');
+                    $filetag->move($destag,$filenametag);
+                    $banner->price_tag = $filenametag;
+                    }
+                    
+                }
+                $banner->heading=$req->heading;
+                $banner->description=$req->bannerdescription;
+                $banner->save();
             }
-            $banner->heading=$req->heading;
-            $banner->description=$req->bannerdescription;
-            $banner->save();
+            return redirect('/showbanner')->with('status',"Updates Successfully !");
+
+            }catch(\Exception $ex){
+                return view('layouts.pagenotfound')->with('error', $ex->getMessage());
+            }
         }
-        return redirect('/displaycms')->with('status',"Updates Successfully !");
+        
     }
 
     // delete banner
@@ -141,11 +171,9 @@ class BannerController extends Controller
                 unlink($destination);
                 $banner->delete();
             }
-             
-        }catch(\Exception $exception){
-            return view('banner.bannernotfound');
+            return back()->with('status',"Banner Removed");
+        }catch(\Exception $ex){
+            return view('layouts.pagenotfound')->with('error', $ex->getMessage());
         }
-        
-        return back();
     }
 }

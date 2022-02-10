@@ -13,7 +13,7 @@
 
             <div class="card-body">
                 @if (session('status'))
-                    <div class="alert alert-success" role="alert">
+                    <div class="alert alert-success" id="successMessage" role="alert">
                         {{ session('status') }}
                     </div>
                 @endif
@@ -26,6 +26,7 @@
                         <th scope="col">Sender Email</th>
                         <th scope="col">Subject</th>
                         <th scope="col">Message</th>
+                        <th scope="col">Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -36,6 +37,12 @@
                                 <td>{{$contact->email}}</td>
                                 <td>{{$contact->subject}}</td>
                                 <td>{{$contact->message}}</td>
+
+                                    @if ($contact->status == 0)
+                                    <td><a href="replycontact/{{ $contact->id }}" class="btn btn-success btn-sm" role="button">Reply</a></td>
+                                    @else
+                                    <td class="text text-danger">Replied</td>
+                                    @endif
                             </tr>
                         @endforeach
                     </tbody>
@@ -47,11 +54,40 @@
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        $(function () {
-            $("#example1").DataTable({
-            "responsive": true, "lengthChange": false, "autoWidth": false,
-            "buttons": ["copy", "csv", "excel", "pdf"]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+       $(function () {
+            $('#example1').DataTable( {
+                "responsive": false, 
+                "lengthChange": false,
+                "autoWidth": false,
+                dom: 'Blfrtip',
+                buttons: [
+                    {
+                extend: 'csv',
+                footer: false,
+                exportOptions: {
+                        columns: [0,1,2,3,4,5]
+                    }
+            },
+            {
+                extend: 'excel',
+                footer: false,
+                exportOptions: {
+                        columns: [0,1,2,3,4,5]
+                    }
+            },
+            {
+                extend: 'pdf',
+                title:'ContactUs',
+                footer: true,
+                exportOptions: {
+                        columns: [0,1,2,3,4,5]
+                    }
+            }
+            ]
+            } ).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });
+        setTimeout(function() {
+        $('#successMessage').fadeOut('fast');
+    }, 3000);
     </script>
 @endsection
